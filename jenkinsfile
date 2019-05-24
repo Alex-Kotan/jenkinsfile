@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    tools {
+        maven 'maven3'
+    }
+
+    stages {
+        stage ('git clone') {
+            steps {
+                git 'https://github.com/Alex-Kotan/box.git'
+            }
+
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+
+
+        stage ('deploy') {
+            steps {
+                sshagent(credentials : ['0e0bfd96-6535-4067-8d47-13178e2c2200']) {
+                sh 'scp ${WORKSPACE}/target/*.war root@35.228.171.124:/var/lib/tomcat8/webapps'
+                }
+            }
+        }
+    }
+}
